@@ -18,20 +18,6 @@ export default function Footer() {
           <p className="font-heading text-base text-ink sm:text-lg">{footer.tagline}</p>
           <Dots />
 
-          <dl className="grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl bg-white px-5 py-5 shadow-soft-sm">
-              <dt className="text-xs text-ink-soft">الموقع</dt>
-              <dd className="mt-1.5 font-heading text-base text-ink">{contact.city}</dd>
-            </div>
-            <div className="rounded-2xl bg-white px-5 py-5 shadow-soft-sm">
-              <dt className="text-xs text-ink-soft">التوقيت</dt>
-              <dd className="mt-1.5 font-heading text-base text-ink">8:00 — 16:30</dd>
-            </div>
-            <div className="rounded-2xl bg-white px-5 py-5 shadow-soft-sm">
-              <dt className="text-xs text-ink-soft">النقل</dt>
-              <dd className="mt-1.5 font-heading text-base text-ink">كامل مدينة تاسوست</dd>
-            </div>
-          </dl>
 
           <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
             <a href={contact.phoneTel} dir="ltr" className="focus-ring rounded-xl font-heading text-base text-ink transition-colors hover:text-pink">

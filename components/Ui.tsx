@@ -46,7 +46,7 @@ export function CtaButton({
   className?: string;
 }) {
   const base =
-    'focus-ring inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-4 font-heading text-base transition-all duration-300 sm:text-lg';
+    'focus-ring inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl px-8 py-4 font-heading text-base transition-all duration-300 sm:text-lg';
   const styles =
     variant === 'primary'
       ? 'bg-pink text-white shadow-soft hover:bg-pink-deep hover:shadow-soft-lg active:scale-[0.985]'
@@ -72,7 +72,7 @@ export function WhatsAppLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`focus-ring inline-flex items-center gap-2 rounded-2xl px-6 py-3.5 font-heading text-base text-ink transition-colors duration-300 hover:text-pink ${className}`}
+      className={`focus-ring inline-flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-3.5 font-heading text-base text-ink transition-colors duration-300 hover:text-pink ${className}`}
     >
       <WhatsAppIcon className="h-5 w-5" />
       {label}

@@ -49,8 +49,8 @@ export default function Header() {
         <nav className="flex items-center gap-1 sm:gap-2">
           <div className="hidden items-center gap-1 md:flex">
             {[
-              { href: '#how', label: nav.how },
-              { href: '#gallery', label: nav.gallery },
+              { href: '#change', label: nav.change },
+              { href: '#activities', label: nav.activities },
               { href: '#faq', label: nav.faq },
             ].map((item) => (
               <Link
