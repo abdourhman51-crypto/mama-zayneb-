@@ -19,6 +19,9 @@ export default function Header() {
   }, []);
 
   const solid = scrolled;
+  // لون روابط التنقّل ينتقل من الأبيض فوق الصورة إلى لون النصّ فوق الخلفية الكريمية
+  const mix = (from: number, to: number) => Math.round(from + (to - from) * solid);
+  const navColor = `rgb(${mix(255, 74)}, ${mix(255, 59)}, ${mix(255, 114)})`;
 
   return (
     <header
@@ -53,8 +56,11 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="focus-ring rounded-xl px-4 py-2 font-heading text-sm text-ink transition-colors duration-300 hover:text-pink"
-                style={{ textShadow: solid < 0.35 ? '0 1px 12px rgba(255,255,255,0.85)' : 'none' }}
+                className="focus-ring rounded-xl px-4 py-2 font-heading text-sm transition-colors duration-200 hover:!text-pink"
+                style={{
+                  color: navColor,
+                  textShadow: solid < 0.6 ? '0 2px 14px rgba(35,25,60,0.55)' : 'none',
+                }}
               >
                 {item.label}
               </Link>

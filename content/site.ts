@@ -87,7 +87,6 @@ export const gallery = {
   intro: 'صور حقيقية من فضاءات ماما زينب.',
   items: [
     { src: '/images/classroom.webp', alt: 'أطفال حول طاولات ملوّنة داخل قاعة النشاط', caption: 'قاعة النشاط' },
-    { src: '/images/hero-drawing.webp', alt: 'طفلة ترتدي مريول الروضة وترسم بأقلام ملوّنة', caption: 'وقت الرسم' },
     { src: '/images/pool.webp', alt: 'أطفال يلعبون في المسبح خلال نشاط صيفي', caption: 'نشاط خارجي' },
   ],
 };

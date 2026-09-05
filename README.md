@@ -79,8 +79,8 @@ export const hero = {
 |---|---|
 | `logo.png` | الشريط العلوي والتذييل (بخلفية شفّافة) |
 | `hero-drawing.webp` | صورة الـHero التي تملأ الشاشة |
-| `classroom.webp` | الصورة الكبيرة في شبكة المرافق |
-| `pool.webp` | الصورة الصغيرة في شبكة المرافق |
+| `classroom.webp` | الصورة الكبيرة في شبكة «لمحة من الروضة» |
+| `pool.webp` | الصورة الصغيرة بجانبها |
 
 ### لإضافة صورة جديدة إلى الشبكة
 
@@ -277,7 +277,7 @@ npx sharp-cli --input photo.jpg --output public/images/photo.webp resize 1400 --
 
 | # | ما هو ينقص | أين يوضَع |
 |---|---|---|
-| 1 | **صور إضافية للمرافق** — حالياً ثلاث صور فقط | `public/images/` + `gallery.items` في `content/site.ts` |
+| 1 | **صور إضافية للمرافق** — حالياً صورتان فقط في الشبكة | `public/images/` + `gallery.items` في `content/site.ts` |
 | 2 | **العنوان الدقيق للروضة** — حالياً «تاسوست، جيجل» فقط | `contact.city` |
 | 3 | **أيام العمل** — التوقيت معروف لكن الأيام لا | `contact.hours` + سؤال «ما أوقات العمل؟» في `faq` |
 | 4 | **`NEXT_PUBLIC_META_PIXEL_ID`** | متغيّرات البيئة على Vercel |
