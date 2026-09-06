@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { normalizeDzPhone } from '@/lib/phone';
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/lib/supabase/config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -43,15 +44,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'validation_failed' }, { status: 422 });
   }
 
-  const url = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // يُفضَّل مفتاح service_role إن كان مضبوطاً؛ وإلّا نستعمل المفتاح العام
+  // مع سياسة الإدراج العام. في الحالتين الإدراج يتم من الخادم لا من المتصفّح.
+  const url = process.env.SUPABASE_URL || SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
 
-  if (!url || !serviceKey) {
-    console.error('Supabase env vars are missing');
-    return NextResponse.json({ error: 'server_misconfigured' }, { status: 500 });
-  }
-
-  const supabase = createClient(url, serviceKey, {
+  const supabase = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 

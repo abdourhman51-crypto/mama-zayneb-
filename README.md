@@ -152,6 +152,11 @@ npx sharp-cli --input photo.jpg --output public/images/photo.webp resize 1400 --
 | `SUPABASE_URL` | رابط المشروع | Supabase → Project Settings → **Data API** → Project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | المفتاح السرّي | Supabase → Project Settings → **API Keys** → `service_role` |
 
+**المتغيّران اختياريان.** المشروع يعمل بدونهما: الرابط والمفتاح العام
+(anon) مكتوبان في `lib/supabase/config.ts`، والإدراج يمرّ عبر سياسة
+`leads_public_insert`. إضافة `service_role` ترفع مستوى الأمان لأن
+الإدراج يتجاوز RLS، لكنّها ليست شرطاً للتشغيل.
+
 > ⚠️ مفتاح `service_role` سرّي تماماً. لا تضعه في متغيّر يبدأ بـ `NEXT_PUBLIC_`،
 > ولا في أي ملف يُرفَع إلى GitHub. من يملكه يملك قاعدة البيانات كاملة.
 
@@ -318,6 +323,65 @@ npx sharp-cli --input photo.jpg --output public/images/photo.webp resize 1400 --
 
 البنية جاهزة في `app/api/capi/route.ts` لكنها **غير مفعّلة**؛ المسار يعيد `501`
 حتى تُضاف `META_CAPI_ACCESS_TOKEN`. خطوات التفعيل مشروحة داخل الملف نفسه.
+
+---
+
+## 6.5 منصّة الإدارة (`/dashboard`)
+
+واجهة مستقلّة داخل نفس المشروع لرؤية التسجيلات ومتابعتها.
+
+### الدخول
+
+| الرابط | `https://mama-zayneb.vercel.app/login` |
+|---|---|
+
+الحسابان منشآن مسبقاً في Supabase Auth. **غيّر كلمتَي المرور بعد أول دخول**
+من Supabase → Authentication → Users → ⋯ → Reset password.
+
+### من يستطيع الدخول
+
+لا يكفي أن يكون للشخص حساب في Supabase — يجب أن يكون **مسجّلاً في جدول
+`public.staff`**. هذا يمنع أي شخص ينشئ حساباً بنفسه من رؤية أرقام هواتف
+الأولياء.
+
+لإضافة موظّف جديد:
+
+1. Supabase → **Authentication** → **Users** → **Add user** (فعّل
+   *Auto Confirm User*).
+2. انسخ الـ`User UID` الظاهر في القائمة.
+3. Supabase → **SQL Editor** ونفّذ:
+
+```sql
+insert into public.staff (user_id, full_name, role)
+values ('الصق-الـUID-هنا', 'اسم الموظّف', 'admin');
+```
+
+الأدوار المتاحة: `owner` · `admin` · `viewer` (الدور محفوظ للتوسّع لاحقاً؛
+حالياً الثلاثة يرون نفس الشيء).
+
+لسحب الصلاحية: `delete from public.staff where user_id = '...';`
+
+### الوحدات
+
+| الوحدة | الحالة | الرابط |
+|---|---|---|
+| التسجيلات | تعمل | `/dashboard` |
+| متابعة الأولياء (CRM) | قيد البناء | `/dashboard/crm` |
+| الموارد البشرية | المرحلة القادمة | `/dashboard/hr` |
+| المالية | المرحلة القادمة | `/dashboard/finance` |
+| التقارير | المرحلة القادمة | `/dashboard/reports` |
+
+الوحدات المقفلة صفحات حقيقية تشرح ما ستفعله، بمعاينة صمّاء بلا أي بيانات
+أو أرقام مختلَقة.
+
+### لفتح وحدة جديدة لاحقاً
+
+1. غيّر `status` إلى `'live'` في `content/dashboard.ts`.
+2. أنشئ `app/dashboard/<slug>/page.tsx` بمحتواها الحقيقي.
+3. أضِف جداولها في migration جديدة مع سياسة `using (public.is_staff())`.
+
+البنية مهيّأة لذلك: الشريط الجانبي والصلاحيات وقالب الصفحة المقفلة تعمل
+جميعها انطلاقاً من `content/dashboard.ts`.
 
 ---
 
