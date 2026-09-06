@@ -3,11 +3,13 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Loader2, Lock, Phone } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { phoneToLoginIdentity } from '@/lib/staffAuth';
 import { login } from '@/content/dashboard';
 
 const field =
-  'focus-ring w-full rounded-2xl border border-ink/12 bg-white px-5 py-4 font-body text-base text-ink shadow-soft-sm transition-colors duration-200 placeholder:text-ink/35 hover:border-ink/20';
+  'focus-ring w-full rounded-2xl border border-ink/12 bg-white py-4 pl-5 pr-12 text-left font-body text-base text-ink shadow-soft-sm transition-colors duration-200 placeholder:text-ink/30 hover:border-ink/20';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,35 +21,39 @@ export default function LoginPage() {
     event.preventDefault();
     setError(null);
     setDetail(null);
-    setStatus('loading');
 
     const fd = new FormData(event.currentTarget);
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: String(fd.get('email') ?? '').trim(),
+    const identity = phoneToLoginIdentity(String(fd.get('phone') ?? ''));
+
+    if (!identity) {
+      setError(login.phoneInvalid);
+      return;
+    }
+
+    setStatus('loading');
+
+    const { error: authError } = await createClient().auth.signInWithPassword({
+      email: identity,
       password: String(fd.get('password') ?? ''),
     });
 
     if (authError) {
       const wrongCredentials = /invalid login credentials/i.test(authError.message);
       setError(wrongCredentials ? login.error : login.generic);
-      // نعرض الرسالة الأصلية عند أي خطأ آخر حتى يمكن تشخيصه بلا تخمين
       if (!wrongCredentials) setDetail(authError.message);
       setStatus('idle');
       return;
     }
 
-    // الوجهة تُقرأ من العنوان مباشرة — بلا useSearchParams حتى تُعرَض
-    // الاستمارة من الخادم دون انتظار جافاسكربت.
     const next = new URLSearchParams(window.location.search).get('next');
     router.replace(next && next.startsWith('/dashboard') ? next : '/dashboard');
     router.refresh();
   }
 
   return (
-    <main className="flex min-h-[100svh] items-center justify-center bg-cream px-5 py-16">
-      <div className="w-full max-w-md">
-        <div className="flex flex-col items-center gap-5 text-center">
+    <main className="flex min-h-[100svh] items-center justify-center bg-cream px-5 py-12">
+      <div className="w-full max-w-sm">
+        <div className="flex flex-col items-center gap-4 text-center">
           <Image
             src="/images/logo.png"
             alt="روضة ماما زينب"
@@ -56,40 +62,56 @@ export default function LoginPage() {
             priority
             className="h-16 w-auto"
           />
-          <h1 className="font-heading text-2xl text-ink">{login.title}</h1>
+          <h1 className="font-heading text-xl text-ink sm:text-2xl">{login.title}</h1>
           <p className="text-sm text-ink-soft">{login.subtitle}</p>
         </div>
 
-        <div className="mt-9 rounded-[32px] bg-card p-7 shadow-soft sm:p-9">
-          <form onSubmit={onSubmit} className="space-y-5">
+        <div className="mt-8 rounded-[28px] bg-card p-6 shadow-soft sm:p-8">
+          <form onSubmit={onSubmit} className="space-y-5" noValidate>
             <div>
-              <label htmlFor="email" className="mb-2 block font-heading text-sm text-ink">
-                {login.email}
+              <label htmlFor="phone" className="mb-2 block font-heading text-sm text-ink">
+                {login.phone}
               </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                dir="ltr"
-                autoComplete="email"
-                className={`${field} text-start`}
-              />
+              <div className="relative">
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  inputMode="tel"
+                  required
+                  dir="ltr"
+                  autoComplete="tel"
+                  placeholder={login.phonePlaceholder}
+                  className={field}
+                />
+                <Phone
+                  className="pointer-events-none absolute inset-y-0 right-4 my-auto h-[1.15rem] w-[1.15rem] text-ink/30"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
+              </div>
             </div>
 
             <div>
               <label htmlFor="password" className="mb-2 block font-heading text-sm text-ink">
                 {login.password}
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                dir="ltr"
-                autoComplete="current-password"
-                className={`${field} text-start`}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  dir="ltr"
+                  autoComplete="current-password"
+                  className={field}
+                />
+                <Lock
+                  className="pointer-events-none absolute inset-y-0 right-4 my-auto h-[1.15rem] w-[1.15rem] text-ink/30"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
+              </div>
             </div>
 
             {error ? (
@@ -106,9 +128,16 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="focus-ring w-full rounded-2xl bg-pink px-8 py-4 font-heading text-lg text-white shadow-soft transition-all duration-300 hover:bg-pink-deep disabled:opacity-65"
+              className="focus-ring flex w-full items-center justify-center gap-2.5 rounded-2xl bg-pink px-8 py-4 font-heading text-base text-white shadow-soft transition-all duration-300 hover:bg-pink-deep disabled:opacity-65"
             >
-              {status === 'loading' ? login.submitting : login.submit}
+              {status === 'loading' ? (
+                <>
+                  <Loader2 className="h-[1.15rem] w-[1.15rem] animate-spin" strokeWidth={2} aria-hidden="true" />
+                  {login.submitting}
+                </>
+              ) : (
+                login.submit
+              )}
             </button>
           </form>
         </div>

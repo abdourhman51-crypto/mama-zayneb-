@@ -1,4 +1,6 @@
+import { Lock } from 'lucide-react';
 import { lockedPage, statusLabels, type DashboardModule } from '@/content/dashboard';
+import { ModuleIcon } from './icons';
 
 /** بطاقة معاينة صمّاء — توحي بشكل الوحدة دون ادّعاء بيانات. */
 function Preview() {
@@ -32,8 +34,13 @@ export default function LockedModule({ module: m }: { module: DashboardModule })
   return (
     <div className="mx-auto max-w-4xl">
       <header>
-        <div className="flex flex-wrap items-center gap-2.5">
-          <span className="rounded-full bg-yellow/25 px-3.5 py-1.5 font-heading text-xs text-ink">
+        <span className="grid h-14 w-14 place-items-center rounded-3xl bg-white shadow-soft-sm">
+          <ModuleIcon name={m.icon} className="h-6 w-6 text-pink" />
+        </span>
+
+        <div className="mt-6 flex flex-wrap items-center gap-2.5">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow/25 px-3.5 py-1.5 font-heading text-xs text-ink">
+            <Lock className="h-3 w-3" strokeWidth={2.2} aria-hidden="true" />
             {lockedPage.badge}
           </span>
           <span className="rounded-full bg-ink/5 px-3.5 py-1.5 font-heading text-xs text-ink-soft">
@@ -41,14 +48,14 @@ export default function LockedModule({ module: m }: { module: DashboardModule })
           </span>
         </div>
 
-        <h1 className="mt-6 font-heading text-2xl leading-[1.45] text-ink sm:text-3xl sm:leading-[1.4]">
+        <h2 className="mt-6 font-heading text-2xl leading-[1.45] text-ink sm:text-3xl sm:leading-[1.4]">
           {m.label}
-        </h1>
+        </h2>
         <p className="mt-3 font-heading text-lg leading-[1.8] text-ink-soft sm:text-xl">{m.promise}</p>
       </header>
 
       <section className="mt-10">
-        <h2 className="font-heading text-base text-ink sm:text-lg">{lockedPage.whatYouGet}</h2>
+        <h3 className="font-heading text-base text-ink sm:text-lg">{lockedPage.whatYouGet}</h3>
         <ul className="mt-5 space-y-3">
           {m.bullets.map((b) => (
             <li
@@ -67,7 +74,7 @@ export default function LockedModule({ module: m }: { module: DashboardModule })
       </section>
 
       <section className="mt-10 rounded-[32px] bg-green/[0.12] px-7 py-8 sm:px-9 sm:py-10">
-        <h2 className="font-heading text-base text-ink sm:text-lg">{lockedPage.foundationTitle}</h2>
+        <h3 className="font-heading text-base text-ink sm:text-lg">{lockedPage.foundationTitle}</h3>
         <p className="mt-3 text-[0.95rem] leading-[2.05] text-ink-soft sm:text-base">
           {lockedPage.foundationBody}
         </p>

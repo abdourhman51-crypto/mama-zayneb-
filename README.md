@@ -330,13 +330,25 @@ npx sharp-cli --input photo.jpg --output public/images/photo.webp resize 1400 --
 
 واجهة مستقلّة داخل نفس المشروع لرؤية التسجيلات ومتابعتها.
 
-### الدخول
+### الدخول — برقم الهاتف
 
 | الرابط | `https://mama-zayneb.vercel.app/login` |
 |---|---|
 
-الحسابان منشآن مسبقاً في Supabase Auth. **غيّر كلمتَي المرور بعد أول دخول**
-من Supabase → Authentication → Users → ⋯ → Reset password.
+**كيف يعمل الدخول بالرقم بلا مزوّد SMS:** رقم الهاتف يُحوَّل داخلياً إلى
+هوية بالشكل `<الرقم>@staff.mamazayneb.dz`. هذا النطاق وهميّ ولا يُرسَل
+إليه بريد إطلاقاً — هو مجرّد شكل تتطلّبه خدمة المصادقة. النتيجة: لا اشتراك
+في خدمة رسائل، ولا كشف لبريد أي موظّف. المنطق في `lib/staffAuth.ts`.
+
+الأرقام المسجّلة حالياً:
+
+| الرقم | الدور |
+|---|---|
+| `0771888841` | المالِكة |
+| `0770000001` | المشرف التقني (رقم مؤقّت) |
+
+**غيّر كلمتَي المرور بعد أول دخول** من Supabase → Authentication → Users
+→ ⋯ → Reset password.
 
 ### من يستطيع الدخول
 
@@ -346,15 +358,18 @@ npx sharp-cli --input photo.jpg --output public/images/photo.webp resize 1400 --
 
 لإضافة موظّف جديد:
 
-1. Supabase → **Authentication** → **Users** → **Add user** (فعّل
-   *Auto Confirm User*).
+1. Supabase → **Authentication** → **Users** → **Add user**
+   (فعّل *Auto Confirm User*). في خانة البريد اكتب هوية الدخول
+   بالشكل: `0669112233@staff.mamazayneb.dz` — أي رقم هاتفه ثم النطاق.
 2. انسخ الـ`User UID` الظاهر في القائمة.
 3. Supabase → **SQL Editor** ونفّذ:
 
 ```sql
-insert into public.staff (user_id, full_name, role)
-values ('الصق-الـUID-هنا', 'اسم الموظّف', 'admin');
+insert into public.staff (user_id, full_name, role, phone, email)
+values ('الصق-الـUID-هنا', 'اسم الموظّف', 'admin', '0669112233', 'بريده@مثال.com');
 ```
+
+عمود `phone` هو ما يُعرَض في المنصّة، و`email` للتواصل فقط لا للدخول.
 
 الأدوار المتاحة: `owner` · `admin` · `viewer` (الدور محفوظ للتوسّع لاحقاً؛
 حالياً الثلاثة يرون نفس الشيء).
@@ -374,11 +389,24 @@ values ('الصق-الـUID-هنا', 'اسم الموظّف', 'admin');
 الوحدات المقفلة صفحات حقيقية تشرح ما ستفعله، بمعاينة صمّاء بلا أي بيانات
 أو أرقام مختلَقة.
 
+### الواجهة
+
+- **شريط جانبي قابل للطيّ** على الشاشات الكبيرة (يُحفَظ تفضيل الطيّ لكل
+  جهاز في `localStorage`)، و**درج منزلق** على الهاتف مع طبقة تعتيم
+  وإغلاق بمفتاح Escape.
+- أيقونة خاصّة بكل وحدة من `lucide-react` — اسم الأيقونة مكتوب في
+  `content/dashboard.ts` وتُربَط في `components/dashboard/icons.tsx`.
+- شريط علوي لاصق يعرض اسم القسم ووصفه ودور المستخدم.
+- صفحة التسجيلات: بحث فوري بالاسم أو الرقم، تصفية بالحالة، أربعة
+  مؤشّرات، جدول على الحاسوب وبطاقات بزرّ اتصال على الهاتف.
+
 ### لفتح وحدة جديدة لاحقاً
 
 1. غيّر `status` إلى `'live'` في `content/dashboard.ts`.
 2. أنشئ `app/dashboard/<slug>/page.tsx` بمحتواها الحقيقي.
 3. أضِف جداولها في migration جديدة مع سياسة `using (public.is_staff())`.
+4. لأيقونة جديدة: أضِف اسمها في `content/dashboard.ts` وسجّلها في
+   `components/dashboard/icons.tsx`.
 
 البنية مهيّأة لذلك: الشريط الجانبي والصلاحيات وقالب الصفحة المقفلة تعمل
 جميعها انطلاقاً من `content/dashboard.ts`.

@@ -9,6 +9,10 @@ export type DashboardModule = {
   slug: string;
   href: string;
   label: string;
+  /** اسم الأيقونة من lucide-react */
+  icon: string;
+  /** وصف قصير يظهر في الشريط العلوي */
+  tagline: string;
   status: ModuleStatus;
   phase: string;
   /** الوعد في سطر واحد — يظهر في البطاقة وفي رأس الصفحة */
@@ -35,6 +39,8 @@ export const modules: DashboardModule[] = [
     slug: 'leads',
     href: '/dashboard',
     label: 'التسجيلات',
+    icon: 'Inbox',
+    tagline: 'كل ولي ترك رقمه على صفحة الإعلان',
     status: 'live',
     phase: 'المرحلة 1',
     promise: 'كل ولي ترك رقمه، في مكان واحد.',
@@ -45,6 +51,8 @@ export const modules: DashboardModule[] = [
     slug: 'crm',
     href: '/dashboard/crm',
     label: 'متابعة الأولياء',
+    icon: 'Users',
+    tagline: 'ملفّ لكل عائلة وتذكير بكل مكالمة',
     status: 'building',
     phase: 'المرحلة 2',
     promise: 'من رقم هاتف… إلى طفل مسجَّل.',
@@ -60,6 +68,8 @@ export const modules: DashboardModule[] = [
     slug: 'hr',
     href: '/dashboard/hr',
     label: 'الموارد البشرية',
+    icon: 'IdCard',
+    tagline: 'عقود المربيات وحضورهنّ وأجورهنّ',
     status: 'planned',
     phase: 'المرحلة 3',
     promise: 'فريقك، بلا دفتر ولا ورقة.',
@@ -75,6 +85,8 @@ export const modules: DashboardModule[] = [
     slug: 'finance',
     href: '/dashboard/finance',
     label: 'المالية',
+    icon: 'Wallet',
+    tagline: 'المستحقّات والمصاريف والربح',
     status: 'planned',
     phase: 'المرحلة 3',
     promise: 'تعرفين رقمك الحقيقي، كل صباح.',
@@ -90,6 +102,8 @@ export const modules: DashboardModule[] = [
     slug: 'reports',
     href: '/dashboard/reports',
     label: 'التقارير',
+    icon: 'BarChart3',
+    tagline: 'أرقام تقود قراراتك',
     status: 'planned',
     phase: 'المرحلة 4',
     promise: 'قرارات مبنية على أرقام، لا على إحساس.',
@@ -115,6 +129,10 @@ export const lockedPage = {
 export const leadsPage = {
   title: 'التسجيلات',
   subtitle: 'كل ولي ترك رقمه على صفحة الإعلان.',
+  search: 'ابحث باسم الولي أو رقمه…',
+  searchEmptyTitle: 'لا نتيجة لهذا البحث',
+  searchEmptyBody: 'جرّب اسماً أو رقماً آخر، أو أزل التصفية.',
+  count: (n: number) => `${n} تسجيل`,
   empty: {
     title: 'لا توجد تسجيلات بعد',
     body: 'حين يملأ أول ولي الاستمارة، سيظهر هنا خلال ثوانٍ — باسمه ورقمه ومن أي إعلان جاء.',
@@ -148,12 +166,14 @@ export const leadStatuses = [
 
 export const login = {
   title: 'منصّة ماما زينب',
-  subtitle: 'سجّلي الدخول لرؤية التسجيلات.',
-  email: 'البريد الإلكتروني',
+  subtitle: 'سجّلي الدخول برقم هاتفك.',
+  phone: 'رقم الهاتف',
+  phonePlaceholder: '0771 88 88 41',
+  phoneInvalid: 'أدخل رقم هاتف جزائري صحيح.',
   password: 'كلمة المرور',
   submit: 'دخول',
   submitting: 'جارٍ الدخول…',
-  error: 'البريد أو كلمة المرور غير صحيحة.',
+  error: 'رقم الهاتف أو كلمة المرور غير صحيحة.',
   generic: 'تعذّر تسجيل الدخول.',
   detail: 'السبب التقني:',
 };
