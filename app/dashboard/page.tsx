@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { leadsPage, leadStatuses } from '@/content/dashboard';
-import StatusSelect, { statusTone } from '@/components/dashboard/StatusSelect';
+import StatusSelect from '@/components/dashboard/StatusSelect';
+import { statusLabel, statusTone } from '@/lib/leadStatus';
 
 export const dynamic = 'force-dynamic';
 
@@ -164,7 +165,7 @@ export default async function LeadsPage({
                     </a>
                   </div>
                   <span className={`rounded-full px-3 py-1.5 font-heading text-xs ${statusTone(lead.status)}`}>
-                    {leadStatuses.find((s) => s.value === lead.status)?.label ?? lead.status}
+                    {statusLabel(lead.status)}
                   </span>
                 </div>
 

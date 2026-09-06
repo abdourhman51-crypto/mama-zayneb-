@@ -4,18 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { leadStatuses } from '@/content/dashboard';
-
-const tones: Record<string, string> = {
-  pink: 'bg-pink/12 text-pink-deep',
-  blue: 'bg-blue/18 text-ink',
-  yellow: 'bg-yellow/25 text-ink',
-  green: 'bg-green/22 text-ink',
-  muted: 'bg-ink/8 text-ink-soft',
-};
-
-export function statusTone(value: string) {
-  return tones[leadStatuses.find((s) => s.value === value)?.tone ?? 'muted'];
-}
+import { statusTone } from '@/lib/leadStatus';
 
 export default function StatusSelect({ id, value }: { id: string; value: string }) {
   const [current, setCurrent] = useState(value);
