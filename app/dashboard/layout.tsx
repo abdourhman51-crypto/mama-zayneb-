@@ -2,7 +2,10 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Sidebar from '@/components/dashboard/Sidebar';
 
-export const metadata = { title: 'منصّة ماما زينب' };
+export const metadata = {
+  title: 'منصّة ماما زينب',
+  robots: { index: false, follow: false },
+};
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
