@@ -36,6 +36,7 @@ export const metadata: Metadata = {
     type: 'website',
   },
   robots: { index: true, follow: true },
+  manifest: '/manifest.webmanifest',
 };
 
 export const viewport: Viewport = {

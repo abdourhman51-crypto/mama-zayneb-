@@ -80,7 +80,7 @@ export default function LockedModule({ module: m }: { module: DashboardModule })
         </p>
       </section>
 
-      <p className="mt-10 border-r-2 border-pink/40 pr-5 font-heading text-lg leading-[1.9] text-ink sm:text-xl sm:leading-[1.85]">
+      <p className="mt-10 border-s-2 border-pink/40 ps-5 font-heading text-lg leading-[1.9] text-ink sm:text-xl sm:leading-[1.85]">
         {m.hook}
       </p>
 

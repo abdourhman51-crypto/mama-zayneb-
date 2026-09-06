@@ -5,6 +5,8 @@ import { leadsPage } from '@/content/dashboard';
 import { statusLabel, statusTone } from '@/lib/leadStatus';
 import StatusSelect from '@/components/dashboard/StatusSelect';
 import LeadsToolbar from '@/components/dashboard/LeadsToolbar';
+import PushCard from '@/components/dashboard/PushCard';
+import LiveLeads from '@/components/dashboard/LiveLeads';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,6 +78,12 @@ export default async function LeadsPage({
           تعذّر جلب التسجيلات: {error.message}
         </p>
       ) : null}
+
+      <PushCard />
+
+      <div className="flex justify-end">
+        <LiveLeads />
+      </div>
 
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
         {stats.map(({ label, value, Icon, tone }) => (

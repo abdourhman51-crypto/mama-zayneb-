@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { normalizeDzPhone } from '@/lib/phone';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/lib/supabase/config';
+import { sendPushToStaff } from '@/lib/push/send';
+import { push as pushCopy } from '@/content/dashboard';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -66,6 +68,18 @@ export async function POST(request: Request) {
   if (error) {
     console.error('Supabase insert failed:', error.message);
     return NextResponse.json({ error: 'insert_failed' }, { status: 500 });
+  }
+
+  // إشعار فوري لأجهزة الفريق. فشله لا يمسّ الولي — طلبه محفوظ أصلاً.
+  try {
+    await sendPushToStaff({
+      title: pushCopy.newLeadTitle,
+      body: pushCopy.newLeadBody(parentName),
+      url: '/dashboard',
+      tag: 'new-lead',
+    });
+  } catch (pushError) {
+    console.error('push dispatch failed:', pushError);
   }
 
   return NextResponse.json({ ok: true });

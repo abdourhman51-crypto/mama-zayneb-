@@ -1,0 +1,16 @@
+{
+  "name": "منصّة ماما زينب",
+  "short_name": "ماما زينب",
+  "description": "نظام إدارة روضة ماما زينب",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl",
+  "background_color": "#FBF8F5",
+  "theme_color": "#FBF8F5",
+  "icons": [
+    { "src": "/images/logo.png", "sizes": "428x431", "type": "image/png", "purpose": "any" }
+  ]
+}
