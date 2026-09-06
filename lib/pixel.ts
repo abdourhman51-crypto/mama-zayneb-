@@ -14,7 +14,7 @@ declare global {
 // وإلّا يُستعمل هذا المعرّف مباشرة (معرّفات البيكسل ليست سرّية —
 // تظهر في مصدر الصفحة لأي زائر).
 const FALLBACK_PIXEL_ID = '2615027122286387';
-const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || FALLBACK_PIXEL_ID;
+export const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || FALLBACK_PIXEL_ID;
 
 let loading = false;
 let loaded = false;
@@ -53,9 +53,24 @@ export function loadPixel() {
   loading = false;
 }
 
-/** يطلق حدثاً؛ يحمّل البيكسل أولاً إن لم يكن محمّلاً. */
-export function trackEvent(name: string, params?: Record<string, unknown>) {
+/**
+ * يطلق حدثاً؛ يحمّل البيكسل أولاً إن لم يكن محمّلاً.
+ * مرّر eventId نفسه المُرسَل إلى /api/lead حتى تُزيل ميتا التكرار بين
+ * حدث المتصفّح (هذا) وحدث الخادم (Conversions API) لنفس عملية التسجيل.
+ */
+export function trackEvent(name: string, params?: Record<string, unknown>, eventId?: string) {
   if (!PIXEL_ID || typeof window === 'undefined') return;
   loadPixel();
-  window.fbq?.('track', name, params);
+  if (eventId) window.fbq?.('track', name, params, { eventID: eventId });
+  else window.fbq?.('track', name, params);
+}
+
+/** قيمتا ملفَّي تعريف ميتا (fbp/fbc) من كوكيز المتصفّح — لتحسين مطابقة الأحداث في CAPI. */
+export function readFbCookies(): { fbp: string | null; fbc: string | null } {
+  if (typeof document === 'undefined') return { fbp: null, fbc: null };
+  const read = (name: string) => {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return match ? decodeURIComponent(match[1]) : null;
+  };
+  return { fbp: read('_fbp'), fbc: read('_fbc') };
 }

@@ -306,7 +306,7 @@ npx sharp-cli --input photo.jpg --output public/images/photo.webp resize 1400 --
 |---|---|
 | يحمّل السكربت فور فتح الصفحة | يحمّله بعد **أول تفاعل** من الزائر — Lighthouse يبقى فوق 90 |
 | `PageView` فقط | `PageView` + `ViewContent` + `Lead` |
-| — | `<noscript>` مركّب أيضاً لزوّار بلا جافاسكربت |
+| بيكسل متصفّح فقط | + Conversions API من الخادم لنفس حدث `Lead`، مع إزالة تكرار (انظر أدناه) |
 
 لو لصقت سكربت ميتا يدوياً في `<head>` لأصبح لديك بيكسلان يطلقان
 `PageView` مرّتين — وستفسد أرقام حملتك.
@@ -319,10 +319,38 @@ npx sharp-cli --input photo.jpg --output public/images/photo.webp resize 1400 --
 | `ViewContent` | عند وصول الزائر إلى قسم الاستمارة (35% منه ظاهر) |
 | `Lead` | عند **نجاح الإرسال فقط** — لا عند الضغط على الزر |
 
-### Conversions API
+### Conversions API — مطبَّقة وتعمل
 
-البنية جاهزة في `app/api/capi/route.ts` لكنها **غير مفعّلة**؛ المسار يعيد `501`
-حتى تُضاف `META_CAPI_ACCESS_TOKEN`. خطوات التفعيل مشروحة داخل الملف نفسه.
+عند نجاح الاستمارة، يُرسَل حدث `Lead` من **جهتين معاً**: بيكسل المتصفّح
+(كما في الجدول أعلاه)، وحدث موازٍ من الخادم مباشرة إلى ميتا عبر
+Conversions API (`lib/capi/send.ts`، يُستدعى من `app/api/lead/route.ts`).
+
+**لماذا جهتان لا واحدة:** بيكسل المتصفّح وحده يفقد أحداثاً بسبب حاجبات
+الإعلانات، وضع التصفّح الخاص، وقواعد iOS لتتبّع التطبيقات (ATT). حدث
+الخادم لا يعتمد على متصفّح الزائر إطلاقاً، فيصل حتى لو حُجب البيكسل —
+وهذا يرفع دقّة قياس ميتا لنتائج حملتك ويحسّن استهدافها.
+
+**منع الاحتساب المزدوج:** الحدثان يحملان `event_id` واحداً يُولَّد في
+المتصفّح لحظة الإرسال (`crypto.randomUUID()`) ويُمرَّر إلى الجهتين معاً.
+ميتا تُطابق الحدثين بهذا المعرّف وتحتسبهما كحدث واحد — لا ضِعف في تقاريرك.
+
+**بيانات المطابقة المُرسَلة مع حدث الخادم** (كلّها تُجزَّأ بـSHA-256 قبل
+الإرسال ما عدا العنوان وبيانات الاتصال الفنية):
+رقم الهاتف · عنوان IP · معرّف المتصفّح (`user-agent`) · كوكيز `_fbp`/`_fbc`
+إن وُجدا (تحسين مطابقة اختياري من ميتا، لا نضعهما بأنفسنا).
+
+**للتفعيل:**
+1. Meta Events Manager → اختر البيكسل → **Settings** →
+   **Conversions API** → **Generate access token**.
+2. الصق القيمة في Vercel → Settings → Environment Variables →
+   `META_CAPI_ACCESS_TOKEN` → **Redeploy**.
+
+**للتحقّق من الوصول قبل تشغيل الإعلان:** Meta Events Manager → اختر
+البيكسل → **Test Events** → انسخ الكود الظاهر أعلى الصفحة → أضِفه في
+Vercel كمتغيّر `META_CAPI_TEST_EVENT_CODE` → أعد النشر → املأ الاستمارة
+على الموقع الحيّ → يظهر الحدث في نفس تبويب Test Events خلال ثوانٍ، مع
+أعلام خضراء إن كانت بيانات المطابقة صحيحة. احذف المتغيّر بعد التأكّد —
+وجوده يمنع احتساب الأحداث في التقارير الحقيقية.
 
 ---
 
@@ -543,15 +571,27 @@ components/dashboard/IosInstallPrompt  دعوة التثبيت على آيفون
 
 ```
 app/
-  layout.tsx            الخطوط، dir="rtl"، بيانات SEO
-  page.tsx              ترتيب الأقسام
-  globals.css           الألوان وقناع تلاشي الـHero
-  api/lead/route.ts     استقبال الاستمارة والإدراج في Supabase
-  api/capi/route.ts     بنية Conversions API (غير مفعّلة)
-components/             أقسام الصفحة
-content/site.ts         ★ كل النصوص هنا
-lib/phone.ts            تحقّق من صيغة الرقم الجزائري
-lib/pixel.ts            بيكسل ميتا (تحميل مؤجَّل)
-supabase/migrations/    ملف إنشاء جدول leads والسياسات
-public/images/          اللوقو والصور
+  layout.tsx                  الخطوط، dir="rtl"، بيانات SEO
+  page.tsx                    ترتيب أقسام صفحة الهبوط
+  globals.css                 الألوان، قناع تلاشي الـHero، .tap-feedback
+  login/                      دخول المنصّة برقم الهاتف
+  dashboard/                  منصّة الإدارة (محمية بـmiddleware.ts)
+    page.tsx                  التسجيلات · crm, hr, finance, reports/ وحدات مقفلة
+    loading.tsx                هيكل بصري فوري لكل قسم
+  api/lead/route.ts           استقبال الاستمارة، الإدراج، الإشعار الفوري، CAPI
+  api/push/subscribe/route.ts حفظ اشتراك إشعارات جهاز موظّف
+components/                   أقسام صفحة الهبوط
+components/dashboard/         منصّة الإدارة (Shell، PushCard، LiveLeads، …)
+content/site.ts                ★ كل نصوص صفحة الهبوط
+content/dashboard.ts           ★ كل نصوص منصّة الإدارة
+lib/phone.ts                  تحقّق من صيغة الرقم الجزائري
+lib/pixel.ts                  بيكسل ميتا (تحميل مؤجَّل) + قراءة كوكيز fbp/fbc
+lib/capi/                     Meta Conversions API (hash.ts، send.ts)
+lib/push/                     الإشعارات الفورية (config، client، send)
+lib/supabase/                 عملاء Supabase للمتصفّح والخادم والـmiddleware
+lib/staffAuth.ts               تحويل رقم الهاتف إلى هوية دخول
+middleware.ts                  حماية /dashboard وتحديث جلسة Supabase
+supabase/migrations/           جداول leads، staff، push_subscriptions، والسياسات
+public/images/                 اللوقو والصور
+public/sw.js                   عامل خدمة الإشعارات الفورية
 ```

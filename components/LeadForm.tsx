@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { form, contact, cta } from '@/content/site';
 import { isValidDzPhone } from '@/lib/phone';
-import { trackEvent } from '@/lib/pixel';
+import { trackEvent, readFbCookies } from '@/lib/pixel';
 import { Dots, WhatsAppLink } from './Ui';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
@@ -70,6 +70,14 @@ export default function LeadForm() {
 
     const params = new URLSearchParams(window.location.search);
 
+    // معرّف واحد يُشارَك بين بيكسل المتصفّح وحدث الخادم (Conversions API)
+    // حتى تُزيل ميتا التكرار بين القناتين لنفس عملية التسجيل.
+    const eventId =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID()
+        : `lead-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const { fbp, fbc } = readFbCookies();
+
     try {
       const res = await fetch('/api/lead', {
         method: 'POST',
@@ -83,12 +91,16 @@ export default function LeadForm() {
           website,
           utm_source: params.get('utm_source'),
           utm_campaign: params.get('utm_campaign'),
+          event_id: eventId,
+          event_source_url: window.location.href,
+          fbp,
+          fbc,
         }),
       });
 
       if (!res.ok) throw new Error('request failed');
 
-      trackEvent('Lead', { content_name: 'creche_call_request' });
+      trackEvent('Lead', { content_name: 'creche_call_request' }, eventId);
       setStatus('success');
     } catch {
       setStatus('error');

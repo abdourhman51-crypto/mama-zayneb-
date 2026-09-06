@@ -1,8 +1,10 @@
+import { randomUUID } from 'crypto';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { normalizeDzPhone } from '@/lib/phone';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/lib/supabase/config';
 import { sendPushToStaff } from '@/lib/push/send';
+import { sendLeadEventToMeta } from '@/lib/capi/send';
 import { push as pushCopy } from '@/content/dashboard';
 
 export const runtime = 'nodejs';
@@ -17,6 +19,10 @@ type Body = {
   website?: string;
   utm_source?: string | null;
   utm_campaign?: string | null;
+  event_id?: string;
+  event_source_url?: string;
+  fbp?: string | null;
+  fbc?: string | null;
 };
 
 const MAX = { name: 120, age: 60, start: 60, note: 1000, utm: 160 };
@@ -80,6 +86,23 @@ export async function POST(request: Request) {
     });
   } catch (pushError) {
     console.error('push dispatch failed:', pushError);
+  }
+
+  // Meta Conversions API. فشلها أو غياب الإعداد لا يمسّ الولي إطلاقاً —
+  // راجع lib/capi/send.ts.
+  try {
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    await sendLeadEventToMeta({
+      eventId: body.event_id || randomUUID(),
+      phone,
+      eventSourceUrl: clip(body.event_source_url, 500) ?? 'https://mama-zayneb.vercel.app/',
+      clientIp: forwardedFor ? forwardedFor.split(',')[0].trim() : null,
+      userAgent: request.headers.get('user-agent'),
+      fbp: clip(body.fbp, 200),
+      fbc: clip(body.fbc, 200),
+    });
+  } catch (capiError) {
+    console.error('CAPI dispatch failed:', capiError);
   }
 
   return NextResponse.json({ ok: true });
