@@ -276,14 +276,35 @@ npx sharp-cli --input photo.jpg --output public/images/photo.webp resize 1400 --
 
 ## 6. وضع بيكسل ميتا
 
-### إضافة المعرّف
+### المعرّف المستعمل
 
-1. Meta **Events Manager** → **Data Sources** → اختر البيكسل → انسخ **Pixel ID**.
-2. في Vercel → Settings → Environment Variables أضِف:
-   `NEXT_PUBLIC_META_PIXEL_ID` = المعرّف.
-3. أعد النشر (**Redeploy**).
+البيكسل **مربوط وجاهز**. المعرّف `2615027122286387` مكتوب مباشرة في
+`lib/pixel.ts` و`app/layout.tsx`، فلا تحتاج ضبط أي شيء في Vercel.
 
-إن تُرك المتغيّر فارغاً، لا يُحمَّل البيكسل ولا يظهر أي خطأ.
+معرّفات البيكسل ليست سرّية — تظهر في مصدر الصفحة لأي زائر، ولهذا
+لا مانع من كتابتها في الكود.
+
+**لتغيير البيكسل لاحقاً،** لك طريقان:
+
+- **الأسهل:** عدّل `FALLBACK_PIXEL_ID` في `lib/pixel.ts` والقيمة في
+  `app/layout.tsx`، ثم `git push`.
+- **بلا لمس الكود:** أضِف `NEXT_PUBLIC_META_PIXEL_ID` في
+  Vercel → Settings → Environment Variables، ثم **Redeploy**.
+  قيمته تتقدّم على المكتوب في الكود.
+
+### طريقة التركيب — ولماذا تختلف عمّا يعطيك ميتا
+
+لوحة ميتا تطلب لصق سكربت جاهز بين `<head>` و`</head>`. **لا تفعل ذلك هنا.**
+السكربت مُدمَج في المشروع بنسخة أفضل:
+
+| ما تعطيه ميتا | ما هو مطبَّق عندنا |
+|---|---|
+| يحمّل السكربت فور فتح الصفحة | يحمّله بعد **أول تفاعل** من الزائر — Lighthouse يبقى فوق 90 |
+| `PageView` فقط | `PageView` + `ViewContent` + `Lead` |
+| — | `<noscript>` مركّب أيضاً لزوّار بلا جافاسكربت |
+
+لو لصقت سكربت ميتا يدوياً في `<head>` لأصبح لديك بيكسلان يطلقان
+`PageView` مرّتين — وستفسد أرقام حملتك.
 
 ### الأحداث المرسَلة
 
@@ -314,7 +335,6 @@ npx sharp-cli --input photo.jpg --output public/images/photo.webp resize 1400 --
 | 1 | **صور إضافية لأنشطة أخرى** إن وُجدت | `public/images/` + `gallery.items` في `content/site.ts` |
 | 2 | **العنوان الدقيق للروضة** — حالياً «تاسوست، جيجل» فقط | `contact.city` |
 | 3 | **أيام العمل** — التوقيت معروف لكن الأيام لا | `contact.hours` + سؤال «ما أوقات العمل؟» في `faq` |
-| 4 | **`NEXT_PUBLIC_META_PIXEL_ID`** | متغيّرات البيئة على Vercel |
 | 5 | **رابط الـWebhook من n8n** | Supabase → Database Webhooks |
 | 6 | **صورة مشاركة (OG image)** للفيسبوك والواتساب | `app/opengraph-image.png` + `metadata.openGraph` |
 | 7 | **شهادات الأولياء** إن أردت إضافة القسم لاحقاً | قسم جديد + `content/site.ts` |
