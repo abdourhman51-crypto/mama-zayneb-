@@ -15,6 +15,22 @@ body {
   color: #4A3B72;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* يزيل الوميض الرمادي الافتراضي عند اللمس على الهاتف — الاستجابة
+     البصرية تأتي بدلاً منه من صنف .tap-feedback أدناه */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* استجابة لمس فورية: يصغر العنصر لحظة الضغط بلا انتظار أي شبكة.
+   يُطبَّق على كل الأزرار والروابط القابلة للنقر في لوحة التحكّم. */
+.tap-feedback {
+  transition: transform 120ms ease-out, opacity 120ms ease-out, background-color 200ms ease-out, color 200ms ease-out;
+}
+.tap-feedback:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tap-feedback:active { transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

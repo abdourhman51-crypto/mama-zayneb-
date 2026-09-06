@@ -8,6 +8,7 @@ import { ChevronRight, LogOut, Lock, Menu, PanelLeftClose, X } from 'lucide-reac
 import { createClient } from '@/lib/supabase/client';
 import { brand, modules } from '@/content/dashboard';
 import { ModuleIcon } from './icons';
+import IosInstallPrompt from './IosInstallPrompt';
 
 const STORAGE_KEY = 'mz.sidebar.collapsed';
 
@@ -80,7 +81,7 @@ export default function Shell({
               href={m.href}
               title={compact ? m.label : undefined}
               aria-current={active ? 'page' : undefined}
-              className={`focus-ring group relative flex items-center gap-3 rounded-2xl py-3 font-heading text-sm transition-all duration-200 ${
+              className={`focus-ring tap-feedback group relative flex items-center gap-3 rounded-2xl py-3 font-heading text-sm transition-all duration-200 ${
                 compact ? 'justify-center px-0' : 'px-3.5'
               } ${
                 active
@@ -135,7 +136,7 @@ export default function Shell({
         type="button"
         onClick={signOut}
         title="تسجيل الخروج"
-        className={`focus-ring flex w-full items-center gap-3 rounded-2xl py-3 font-heading text-sm text-ink-soft transition-colors hover:bg-white hover:text-pink-deep ${
+        className={`focus-ring tap-feedback flex w-full items-center gap-3 rounded-2xl py-3 font-heading text-sm text-ink-soft transition-colors hover:bg-white hover:text-pink-deep ${
           compact ? 'justify-center px-0' : 'px-3.5'
         }`}
       >
@@ -179,7 +180,7 @@ export default function Shell({
           onClick={toggleCollapsed}
           aria-label={collapsed ? 'توسيع القائمة' : 'طيّ القائمة'}
           aria-expanded={!collapsed}
-          className="focus-ring mt-6 flex items-center justify-center gap-2 rounded-2xl border border-ink/10 py-2.5 text-ink-soft transition-colors hover:border-ink/20 hover:text-ink"
+          className="focus-ring tap-feedback mt-6 flex items-center justify-center gap-2 rounded-2xl border border-ink/10 py-2.5 text-ink-soft transition-colors hover:border-ink/20 hover:text-ink"
         >
           {collapsed ? (
             <ChevronRight className="h-4 w-4 rotate-180" strokeWidth={2} aria-hidden="true" />
@@ -211,7 +212,7 @@ export default function Shell({
                 type="button"
                 onClick={() => setDrawer(false)}
                 aria-label="إغلاق"
-                className="focus-ring grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-ink-soft"
+                className="focus-ring tap-feedback grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-ink-soft"
               >
                 <X className="h-[1.15rem] w-[1.15rem]" strokeWidth={2} aria-hidden="true" />
               </button>
@@ -234,7 +235,7 @@ export default function Shell({
               type="button"
               onClick={() => setDrawer(true)}
               aria-label="فتح القائمة"
-              className="focus-ring grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-ink/10 bg-white text-ink lg:hidden"
+              className="focus-ring tap-feedback grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-ink/10 bg-white text-ink lg:hidden"
             >
               <Menu className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
             </button>
@@ -252,6 +253,8 @@ export default function Shell({
 
         <main className="px-4 py-6 sm:px-6 sm:py-8 lg:px-9 lg:py-10">{children}</main>
       </div>
+
+      <IosInstallPrompt />
     </div>
   );
 }

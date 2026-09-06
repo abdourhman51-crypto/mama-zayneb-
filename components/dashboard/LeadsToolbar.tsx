@@ -53,7 +53,7 @@ export default function LeadsToolbar({ total }: { total: number }) {
             type="button"
             onClick={() => setTerm('')}
             aria-label="مسح البحث"
-            className="focus-ring absolute inset-y-0 end-3 my-auto grid h-7 w-7 place-items-center rounded-full text-ink/40 hover:bg-cream hover:text-ink"
+            className="focus-ring tap-feedback absolute inset-y-0 end-3 my-auto grid h-7 w-7 place-items-center rounded-full text-ink/40 hover:bg-cream hover:text-ink"
           >
             <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
           </button>
@@ -66,7 +66,7 @@ export default function LeadsToolbar({ total }: { total: number }) {
             <a
               key={s.value}
               href={hrefFor(s.value)}
-              className={`focus-ring whitespace-nowrap rounded-full px-4 py-2 font-heading text-xs transition-colors sm:text-sm ${
+              className={`focus-ring tap-feedback whitespace-nowrap rounded-full px-4 py-2 font-heading text-xs transition-colors sm:text-sm ${
                 status === s.value
                   ? 'bg-ink text-white'
                   : 'bg-white text-ink-soft shadow-soft-sm hover:text-ink'

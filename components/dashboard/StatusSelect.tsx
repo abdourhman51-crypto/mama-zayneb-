@@ -35,7 +35,7 @@ export default function StatusSelect({ id, value }: { id: string; value: string 
         value={current}
         disabled={pending}
         onChange={(e) => update(e.target.value)}
-        className={`focus-ring cursor-pointer rounded-full border-0 px-3.5 py-1.5 font-heading text-xs transition-colors ${statusTone(current)}`}
+        className={`focus-ring tap-feedback cursor-pointer rounded-full border-0 px-3.5 py-1.5 font-heading text-xs transition-colors ${statusTone(current)}`}
       >
         {leadStatuses.map((s) => (
           <option key={s.value} value={s.value}>

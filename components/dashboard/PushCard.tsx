@@ -1,42 +1,70 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BellRing, Check, Loader2, X } from 'lucide-react';
-import { enablePush, readPushState, type PushState } from '@/lib/push/client';
+import { BellRing, Loader2, X } from 'lucide-react';
+import { enablePush, hasActiveSubscription, readPushState, type PushState } from '@/lib/push/client';
 import { push as copy } from '@/content/dashboard';
 
 const DISMISS_KEY = 'mz.push.dismissed';
 
+type ViewState = 'checking' | 'subscribed' | 'promptable' | 'blocked' | 'dismissed' | 'hidden';
+
 export default function PushCard() {
-  const [state, setState] = useState<PushState | null>(null);
+  const [view, setView] = useState<ViewState>('checking');
+  const [permission, setPermission] = useState<PushState>('default');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
-    setState(readPushState());
-    try {
-      setDismissed(window.localStorage.getItem(DISMISS_KEY) === '1');
-    } catch {
-      setDismissed(false);
+    let cancelled = false;
+
+    async function check() {
+      const state = readPushState();
+      if (cancelled) return;
+      setPermission(state);
+
+      if (state === 'unsupported') return setView('hidden');
+      if (state === 'denied') return setView('blocked');
+
+      if (state === 'granted') {
+        // مهمّ: «ممنوح» في المتصفّح لا يعني أن الاشتراك محفوظ فعلاً —
+        // قد يكون قد فشل حفظه سابقاً على هذا الجهاز تحديداً.
+        const active = await hasActiveSubscription();
+        if (cancelled) return;
+        return setView(active ? 'subscribed' : 'promptable');
+      }
+
+      let dismissed = false;
+      try {
+        dismissed = window.localStorage.getItem(DISMISS_KEY) === '1';
+      } catch {
+        dismissed = false;
+      }
+      setView(dismissed ? 'dismissed' : 'promptable');
     }
+
+    check();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function onEnable() {
     setBusy(true);
     setError(null);
-    try {
-      const message = await enablePush();
-      if (message) setError(message);
-    } catch {
-      setError(copy.failed);
+    const message = await enablePush();
+    if (message) {
+      setError(message);
+      setPermission(readPushState());
+      setBusy(false);
+      return;
     }
-    setState(readPushState());
+    setView('subscribed');
     setBusy(false);
   }
 
   function onDismiss() {
-    setDismissed(true);
+    setView('dismissed');
     try {
       window.localStorage.setItem(DISMISS_KEY, '1');
     } catch {
@@ -44,40 +72,24 @@ export default function PushCard() {
     }
   }
 
-  if (state === null) return null;
-
-  // مفعّلة — شريط تأكيد هادئ
-  if (state === 'granted') {
-    return (
-      <div className="flex items-center gap-3 rounded-2xl bg-green/15 px-5 py-3.5">
-        <Check className="h-4 w-4 shrink-0 text-ink" strokeWidth={2.2} aria-hidden="true" />
-        <p className="min-w-0 text-xs leading-[1.8] text-ink sm:text-sm">
-          <span className="font-heading">{copy.enabled}.</span>{' '}
-          <span className="text-ink-soft">{copy.enabledBody}</span>
-        </p>
-      </div>
-    );
+  // مفعّلة فعلاً، أو مرفوضة سابقاً، أو غير مدعومة، أو لا نعرف بعد —
+  // لا داعي لبطاقة مزعجة في كل هذه الحالات.
+  if (view === 'checking' || view === 'subscribed' || view === 'dismissed' || view === 'hidden') {
+    return null;
   }
 
-  if (dismissed && state === 'default') return null;
-
-  const blocked = state === 'denied' || state === 'unsupported';
-  const title = state === 'denied' ? copy.denied : state === 'unsupported' ? copy.unsupported : copy.title;
-  const help = state === 'denied' ? copy.deniedBody : copy.unsupportedBody;
+  const blocked = view === 'blocked';
 
   return (
     <section className="relative overflow-hidden rounded-[28px] bg-card p-6 shadow-soft sm:p-8">
-      <span
-        className="absolute inset-y-0 start-0 w-1.5 bg-pink"
-        aria-hidden="true"
-      />
+      <span className="absolute inset-y-0 start-0 w-1.5 bg-pink" aria-hidden="true" />
 
-      {state === 'default' ? (
+      {!blocked ? (
         <button
           type="button"
           onClick={onDismiss}
           aria-label={copy.dismissed}
-          className="focus-ring absolute end-4 top-4 grid h-8 w-8 place-items-center rounded-full text-ink/30 transition-colors hover:bg-cream hover:text-ink"
+          className="focus-ring tap-feedback absolute end-4 top-4 grid h-8 w-8 place-items-center rounded-full text-ink/30 transition-colors hover:bg-cream hover:text-ink"
         >
           <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
         </button>
@@ -87,10 +99,12 @@ export default function PushCard() {
         <BellRing className="h-[1.35rem] w-[1.35rem]" strokeWidth={1.75} aria-hidden="true" />
       </span>
 
-      <h2 className="mt-5 font-heading text-lg leading-[1.6] text-ink sm:text-xl">{title}</h2>
+      <h2 className="mt-5 font-heading text-lg leading-[1.6] text-ink sm:text-xl">
+        {blocked ? copy.denied : copy.title}
+      </h2>
 
       {blocked ? (
-        <p className="mt-3 max-w-lg text-sm leading-[2] text-ink-soft">{help}</p>
+        <p className="mt-3 max-w-lg text-sm leading-[2] text-ink-soft">{copy.deniedBody}</p>
       ) : (
         <>
           <p className="mt-3 max-w-lg text-sm leading-[2.05] text-ink-soft sm:text-base">{copy.body}</p>
@@ -100,8 +114,9 @@ export default function PushCard() {
           <p className="mt-4 max-w-lg text-sm leading-[2] text-ink-soft">{copy.promise}</p>
 
           {error ? (
-            <p role="alert" className="mt-4 rounded-2xl bg-pink/10 px-4 py-3 text-xs text-pink-deep">
+            <p role="alert" className="mt-4 rounded-2xl bg-pink/10 px-4 py-3 text-xs leading-[1.8] text-pink-deep">
               {error}
+              {permission === 'denied' ? ` ${copy.deniedBody}` : ''}
             </p>
           ) : null}
 
@@ -110,7 +125,7 @@ export default function PushCard() {
               type="button"
               onClick={onEnable}
               disabled={busy}
-              className="focus-ring flex items-center justify-center gap-2.5 rounded-2xl bg-pink px-7 py-3.5 font-heading text-sm text-white shadow-soft-sm transition-colors hover:bg-pink-deep disabled:opacity-65 sm:text-base"
+              className="focus-ring tap-feedback flex items-center justify-center gap-2.5 rounded-2xl bg-pink px-7 py-3.5 font-heading text-sm text-white shadow-soft-sm transition-colors hover:bg-pink-deep disabled:opacity-65 sm:text-base"
             >
               {busy ? (
                 <>

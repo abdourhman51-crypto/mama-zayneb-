@@ -80,10 +80,7 @@ export default async function LeadsPage({
       ) : null}
 
       <PushCard />
-
-      <div className="flex justify-end">
-        <LiveLeads />
-      </div>
+      <LiveLeads />
 
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
         {stats.map(({ label, value, Icon, tone }) => (
