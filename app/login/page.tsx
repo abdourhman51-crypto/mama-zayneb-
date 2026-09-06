@@ -13,10 +13,12 @@ export default function LoginPage() {
   const router = useRouter();
   const [status, setStatus] = useState<'idle' | 'loading'>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [detail, setDetail] = useState<string | null>(null);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setDetail(null);
     setStatus('loading');
 
     const fd = new FormData(event.currentTarget);
@@ -27,7 +29,10 @@ export default function LoginPage() {
     });
 
     if (authError) {
-      setError(authError.message.includes('Invalid') ? login.error : login.generic);
+      const wrongCredentials = /invalid login credentials/i.test(authError.message);
+      setError(wrongCredentials ? login.error : login.generic);
+      // نعرض الرسالة الأصلية عند أي خطأ آخر حتى يمكن تشخيصه بلا تخمين
+      if (!wrongCredentials) setDetail(authError.message);
       setStatus('idle');
       return;
     }
@@ -88,9 +93,14 @@ export default function LoginPage() {
             </div>
 
             {error ? (
-              <p role="alert" className="rounded-2xl bg-pink/10 px-5 py-4 text-sm text-pink-deep">
-                {error}
-              </p>
+              <div role="alert" className="rounded-2xl bg-pink/10 px-5 py-4 text-sm text-pink-deep">
+                <p>{error}</p>
+                {detail ? (
+                  <p className="mt-2 text-xs leading-[1.8] opacity-80" dir="ltr">
+                    {login.detail} {detail}
+                  </p>
+                ) : null}
+              </div>
             ) : null}
 
             <button
