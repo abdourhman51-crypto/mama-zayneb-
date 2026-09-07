@@ -8,12 +8,12 @@ export default function Hero() {
       {/* الصورة تملأ الشاشة وتتلاشى تدريجياً حتى تذوب في الخلفية الكريمية */}
       <div className="hero-fade absolute inset-x-0 top-0 -z-20 h-[76svh] sm:h-[100svh]">
         <Image
-          src="/images/hero-drawing.webp"
-          alt="طفلة في روضة ماما زينب ترسم بأقلام ملوّنة"
+          src="/images/hero-shirt.webp"
+          alt="قميص روضة ماما زينب على طفلة ترسم بأقلام ملوّنة"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[50%_12%] sm:object-[50%_23%]"
+          className="object-cover object-[50%_35%] sm:object-[50%_18%]"
         />
       </div>
 

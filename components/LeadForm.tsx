@@ -155,6 +155,27 @@ export default function LeadForm() {
                   <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
                 </div>
 
+                {/* آخر ثلاثة حواجز تُزال قبل أن يكتب رقمه */}
+                <ul className="mb-7 space-y-2.5 border-b border-ink/10 pb-7">
+                  {form.assurances.map((line) => (
+                    <li key={line} className="flex items-start gap-3">
+                      <svg
+                        viewBox="0 0 20 20"
+                        className="mt-1 h-4 w-4 shrink-0 text-green"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="m4 10.5 4 4 8-9" />
+                      </svg>
+                      <span className="text-sm leading-[1.9] text-ink-soft sm:text-base">{line}</span>
+                    </li>
+                  ))}
+                </ul>
+
                 <Field id="parent_name" label={form.labels.parentName} error={errors.parent_name}>
                   <input
                     id="parent_name"

@@ -1,19 +1,22 @@
 import { trust } from '@/content/site';
 import { SectionHeading } from './Ui';
 import SectionCta from './SectionCta';
+import Reveal from './Reveal';
 
 export default function Trust() {
   return (
     <section id="trust" className="scroll-mt-24 bg-green/[0.10] py-20 sm:py-28">
       <div className="mx-auto max-w-content px-5 sm:px-8">
-        <div className="flex justify-center">
+        <Reveal className="flex justify-center">
           <SectionHeading title={trust.title} intro={trust.intro} />
-        </div>
+        </Reveal>
 
         <ol className="mx-auto mt-14 max-w-3xl space-y-4 sm:mt-16 sm:space-y-5">
           {trust.items.map((item, i) => (
-            <li
+            <Reveal
+              as="li"
               key={item.title}
+              delay={(i % 2) * 90}
               className="flex gap-5 rounded-3xl bg-card px-6 py-6 shadow-soft-sm sm:gap-6 sm:px-9 sm:py-8"
             >
               <span
@@ -28,11 +31,11 @@ export default function Trust() {
                   {item.body}
                 </p>
               </div>
-            </li>
+            </Reveal>
           ))}
         </ol>
 
-        <SectionCta note={trust.ctaNote} />
+        <Reveal><SectionCta note={trust.ctaNote} /></Reveal>
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 import { change } from '@/content/site';
 import { SectionHeading } from './Ui';
 import SectionCta from './SectionCta';
+import Reveal from './Reveal';
 
 const accents: Record<string, string> = {
   pink: 'bg-pink',
@@ -13,14 +14,16 @@ export default function Change() {
   return (
     <section id="change" className="scroll-mt-24 bg-blue/[0.07] py-20 sm:py-28">
       <div className="mx-auto max-w-content px-5 sm:px-8">
-        <div className="flex justify-center">
+        <Reveal className="flex justify-center">
           <SectionHeading title={change.title} intro={change.intro} />
-        </div>
+        </Reveal>
 
         <ul className="mt-14 grid grid-cols-1 gap-5 sm:mt-16 sm:grid-cols-2 sm:gap-6">
-          {change.items.map((item) => (
-            <li
+          {change.items.map((item, i) => (
+            <Reveal
+              as="li"
               key={item.title}
+              delay={(i % 2) * 100}
               className="rounded-3xl bg-card p-7 shadow-soft-sm transition-shadow duration-300 hover:shadow-soft sm:p-9"
             >
               <span
@@ -33,11 +36,11 @@ export default function Change() {
               <p className="mt-3 text-[0.95rem] leading-[2.05] text-ink-soft sm:text-base">
                 {item.body}
               </p>
-            </li>
+            </Reveal>
           ))}
         </ul>
 
-        <SectionCta note={change.ctaNote} />
+        <Reveal><SectionCta note={change.ctaNote} /></Reveal>
       </div>
     </section>
   );

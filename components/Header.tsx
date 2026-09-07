@@ -25,7 +25,7 @@ export default function Header() {
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-50 transition-[backdrop-filter] duration-300"
+      className="site-header fixed inset-x-0 top-0 z-50 transition-[backdrop-filter,transform] duration-300"
       style={{
         backgroundColor: `rgba(251, 248, 245, ${(solid * 0.88).toFixed(3)})`,
         backdropFilter: solid > 0.04 ? `saturate(140%) blur(${(solid * 14).toFixed(1)}px)` : 'none',
@@ -68,7 +68,7 @@ export default function Header() {
           </div>
           <Link
             href="#form"
-            className="focus-ring rounded-2xl bg-pink px-5 py-2.5 font-heading text-sm text-white shadow-soft-sm transition-all duration-300 hover:bg-pink-deep sm:px-6 sm:py-3 sm:text-base"
+            className="header-cta focus-ring tap-feedback rounded-2xl bg-pink px-5 py-2.5 font-heading text-sm text-white shadow-soft-sm transition-all duration-300 hover:bg-pink-deep sm:px-6 sm:py-3 sm:text-base"
           >
             {nav.cta}
           </Link>
