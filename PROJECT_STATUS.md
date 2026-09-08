@@ -274,3 +274,16 @@ README.md                التوثيق الكامل التفصيلي (كل شي
     - كل الحركات في `app/globals.css` بـ`transform`/`opacity` فقط،
       ومعطّلة تحت `prefers-reduced-motion`. حجم صفحة الهبوط بقي
       ضمن حدود الأداء المتّفق عليها.
+
+14. **زرّ حذف التسجيلات في اللوحة**: `components/dashboard/DeleteLeadButton.tsx`
+    (نفس نمط `StatusSelect.tsx` — حذف مباشر عبر عميل Supabase +
+    `router.refresh()`)، مع تأكيد `window.confirm` قبل الحذف. مُضاف في
+    عمود جديد بجدول سطح المكتب وزرّ داخل بطاقة الهاتف. سياسة RLS جديدة
+    `leads_staff_delete` (`for delete … using (is_staff())`) طُبِّقت على
+    قاعدة الإنتاج عبر Supabase MCP وحُفظت أيضاً كملفّ migration
+    (`supabase/migrations/20260908093400_leads_staff_delete_policy.sql`)
+    — لم تكن هناك سياسة حذف من قبل. `components/dashboard/LiveLeads.tsx`
+    كان يستمع فقط لـ`INSERT`/`UPDATE`؛ أُضيف `DELETE` أيضاً حتى يختفي
+    التسجيل المحذوف لحظياً عند كل من يفتح اللوحة، لا فقط عند من ضغط
+    الزرّ. **ملاحظة**: التسجيلات الجديدة كانت تظهر لحظياً بلا تحديث
+    صفحة أصلاً (بند 7) — لم يكن هذا يحتاج إصلاحاً، فقط الحذف كان ناقصاً.

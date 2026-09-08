@@ -52,6 +52,9 @@ export default function LiveLeads() {
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'leads' }, () =>
           router.refresh(),
         )
+        .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'leads' }, () =>
+          router.refresh(),
+        )
         .subscribe();
     }
 

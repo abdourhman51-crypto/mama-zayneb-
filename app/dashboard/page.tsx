@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { leadsPage } from '@/content/dashboard';
 import { statusLabel, statusTone } from '@/lib/leadStatus';
 import StatusSelect from '@/components/dashboard/StatusSelect';
+import DeleteLeadButton from '@/components/dashboard/DeleteLeadButton';
 import LeadsToolbar from '@/components/dashboard/LeadsToolbar';
 import PushCard from '@/components/dashboard/PushCard';
 import LiveLeads from '@/components/dashboard/LiveLeads';
@@ -130,6 +131,9 @@ export default async function LeadsPage({
                         {c}
                       </th>
                     ))}
+                    <th scope="col" className="whitespace-nowrap px-5 py-4 text-start font-body font-normal">
+                      <span className="sr-only">{leadsPage.delete.label}</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -173,6 +177,9 @@ export default async function LeadsPage({
                       <td className="px-5 py-4">
                         <StatusSelect id={lead.id} value={lead.status} />
                       </td>
+                      <td className="px-5 py-4 text-end">
+                        <DeleteLeadButton id={lead.id} name={lead.parent_name} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -196,6 +203,7 @@ export default async function LeadsPage({
                   <span className={`shrink-0 rounded-full px-3 py-1.5 font-heading text-xs ${statusTone(lead.status)}`}>
                     {statusLabel(lead.status)}
                   </span>
+                  <DeleteLeadButton id={lead.id} name={lead.parent_name} className="-me-1.5 -mt-1.5" />
                 </div>
 
                 <dl className="mt-4 grid grid-cols-2 gap-3 text-xs">

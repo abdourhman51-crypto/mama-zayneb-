@@ -154,6 +154,11 @@ export const leadsPage = {
     note: 'ملاحظة',
   },
   filterAll: 'الكل',
+  delete: {
+    label: 'حذف',
+    confirm: (name: string) => `هل تريدين حذف تسجيل ${name}؟ لا يمكن التراجع عن هذا.`,
+    failed: 'تعذّر الحذف — أعد المحاولة',
+  },
 };
 
 export const leadStatuses = [
