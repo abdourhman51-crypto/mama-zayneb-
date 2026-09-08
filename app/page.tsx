@@ -13,6 +13,7 @@ import Footer from '@/components/Footer';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
 import FomoBar from '@/components/FomoBar';
 import PixelLoader from '@/components/PixelLoader';
+import BottomSheet from '@/components/BottomSheet';
 
 export default function Page() {
   return (
@@ -34,6 +35,7 @@ export default function Page() {
       </main>
       <Footer />
       <FloatingWhatsApp />
+      <BottomSheet />
     </>
   );
 }

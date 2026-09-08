@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { fomo } from '@/content/site';
+import { openLeadSheetOnMobile } from '@/lib/leadSheet';
 
 /**
  * شريط الإلحاح — يظهر بعد تمرير 40% من الصفحة، ويختفي عند الوصول
@@ -83,6 +84,9 @@ export default function FomoBar() {
           <Link
             href="#form"
             tabIndex={show ? 0 : -1}
+            onClick={(e) => {
+              if (openLeadSheetOnMobile()) e.preventDefault();
+            }}
             className={`focus-ring tap-feedback shrink-0 rounded-full bg-pink px-4 py-1.5 font-heading text-xs text-white transition-colors hover:bg-pink-deep sm:px-5 sm:py-2 sm:text-sm ${
               show ? 'pointer-events-auto' : ''
             }`}

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { gallery } from '@/content/site';
 import { SectionHeading } from './Ui';
 import SectionCta from './SectionCta';
@@ -6,12 +7,11 @@ import Reveal from './Reveal';
 const dotColors = ['bg-pink', 'bg-blue', 'bg-yellow', 'bg-green'];
 
 /**
- * المرافق والرحلات — قسم نصّي عمداً.
+ * المرافق والرحلات.
  *
- * لماذا بلا صور: كل صور الروضة المتاحة مستعمَلة أصلاً في قسم
- * «الأنشطة» فوقه مباشرة. تكرارها هنا يجعل الصفحة تبدو مكرّرة
- * ومحشوّة. حين تصل صور رحلات جديدة، تُضاف هنا بشبكة تحريرية
- * بأحجام غير متساوية.
+ * الأعلى: قائمة نصّية سريعة القراءة (لا صور مكرّرة مع قسم الأنشطة).
+ * الأسفل: صورة مكتب الاستقبال — أوّل ما يراه الولي حين يدخل، وهي
+ * الصورة الوحيدة هنا لأنّها تُظهر مكاناً لا نشاطاً.
  */
 export default function Gallery() {
   return (
@@ -37,6 +37,33 @@ export default function Gallery() {
             </Reveal>
           ))}
         </ul>
+
+        {/* مكتب الاستقبال — أوّل ما يراه الولي حين يدخل.
+            عرض تحريري: صورة بنسبتها الطبيعية إلى جانب النصّ، بلا إطار
+            ولا بطاقة، والنصّ أبداً فوق الصورة. */}
+        <Reveal className="mt-16 block sm:mt-24">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-14">
+            <div className="lg:w-5/12">
+              <Image
+                src={gallery.reception.src}
+                alt={gallery.reception.alt}
+                width={gallery.reception.w}
+                height={gallery.reception.h}
+                loading="lazy"
+                sizes="(max-width: 1024px) 100vw, 42vw"
+                className="h-auto w-full rounded-[28px] object-cover"
+              />
+            </div>
+            <div className="lg:w-7/12">
+              <h3 className="font-heading text-xl leading-[1.5] text-ink sm:text-3xl sm:leading-[1.45]">
+                {gallery.reception.title}
+              </h3>
+              <p className="mt-3 max-w-xl text-[0.95rem] leading-[2.05] text-ink-soft sm:mt-4 sm:text-lg sm:leading-[2]">
+                {gallery.reception.body}
+              </p>
+            </div>
+          </div>
+        </Reveal>
 
         <Reveal>
           <SectionCta note={gallery.ctaNote} />

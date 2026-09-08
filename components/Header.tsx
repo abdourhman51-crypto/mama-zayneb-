@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { openLeadSheetOnMobile } from '@/lib/leadSheet';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { nav } from '@/content/site';
@@ -68,6 +69,9 @@ export default function Header() {
           </div>
           <Link
             href="#form"
+            onClick={(e) => {
+              if (openLeadSheetOnMobile()) e.preventDefault();
+            }}
             className="header-cta focus-ring tap-feedback rounded-2xl bg-pink px-5 py-2.5 font-heading text-sm text-white shadow-soft-sm transition-all duration-300 hover:bg-pink-deep sm:px-6 sm:py-3 sm:text-base"
           >
             {nav.cta}

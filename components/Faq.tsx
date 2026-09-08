@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { faq } from '@/content/site';
 import { SectionHeading } from './Ui';
+import Reveal from './Reveal';
 
 export default function Faq() {
   const [open, setOpen] = useState<number | null>(0);
@@ -10,9 +11,9 @@ export default function Faq() {
   return (
     <section id="faq" className="scroll-mt-24 bg-yellow/[0.10] py-20 sm:py-28">
       <div className="mx-auto max-w-content px-5 sm:px-8">
-        <div className="flex justify-center">
+        <Reveal className="flex justify-center">
           <SectionHeading title={faq.title} intro={faq.intro} />
-        </div>
+        </Reveal>
 
         <ul className="mx-auto mt-14 max-w-2xl space-y-3 sm:mt-16 sm:space-y-4">
           {faq.items.map((item, i) => {
@@ -40,12 +41,14 @@ export default function Faq() {
                     </span>
                   </button>
                 </h3>
-                <div
-                  id={`faq-panel-${i}`}
-                  hidden={!isOpen}
-                  className="px-6 pb-6 text-[0.95rem] leading-[2.05] text-ink-soft sm:px-8 sm:pb-8 sm:text-base"
-                >
-                  {item.a}
+                {/* أكورديون متحرّك: 0fr → 1fr يمنح ارتفاعاً متحرّكاً
+                    دون قياس بجافاسكربت. النصّ يبقى في الـDOM دائماً. */}
+                <div id={`faq-panel-${i}`} className="acc-panel" data-open={isOpen} role="region" aria-hidden={!isOpen}>
+                  <div className="acc-inner">
+                    <p className="px-6 pb-6 text-[0.95rem] leading-[2.05] text-ink-soft sm:px-8 sm:pb-8 sm:text-base">
+                      {item.a}
+                    </p>
+                  </div>
                 </div>
               </li>
             );
